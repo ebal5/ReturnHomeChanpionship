@@ -1,0 +1,7 @@
+@(name: String)
+
+@main("第17回全国高専帰宅選手権"){
+    <ul>
+        <li>@name さん</li>
+    </ul>
+}

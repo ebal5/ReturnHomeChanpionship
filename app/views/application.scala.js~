@@ -1,0 +1,46 @@
+@(implicit request: RequestHeader)
+
+function Logger(lv){
+    this.showLevel = lv;
+}
+Logger.prototype.logging = function(mes){
+    console.log(mes);
+};
+Logger.prototype.log = function (str, level){
+    level = level || 0;
+    if(level > this.showLevel){
+        var lvMes = "";
+        switch (level){
+        case 0: case 1:
+            lvMes = "[Normal] -- ";
+            break;
+        case 2:
+            lvMes = "[Warning] -- ";
+            break;
+        case 3:
+            lvMes = "[Error] -- ";
+            break;
+        case 4:
+            // Check the spell
+            lvMes = "[Fatle] -- ";
+            break;
+        default:
+            lvMes = "[LogError] -- ";
+        }
+        console.log(lvMes + str);
+    }
+};
+var logger = new Logger(0);
+
+function Application(tgtID, wsURL){
+    this.tgt = document.getElementByID(tgtID || "target");
+    var ws = {
+        init: function (){
+            this.socket = new WebSocket(wsURL || "@routes.Application.gameWS().WebSocketURL()");
+        },
+        socket: 
+    };
+    var canvas = {};
+
+    ws.init();
+}

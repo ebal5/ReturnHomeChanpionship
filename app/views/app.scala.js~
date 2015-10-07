@@ -1,0 +1,4 @@
+function Application(tgtID, wsURL){
+    tgtID = tgtID || "#target";
+    wsURL = wsURL || "@routes.Application.gameWS().WebSocketURL()";
+}

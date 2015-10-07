@@ -1,0 +1,7 @@
+@(enterForm: Form[String])(implicit messages: Messages)
+@main("第17回全国高専帰宅選手権 TOP") {
+    @helper.form(action = routes.Application.enter()){
+        <label>ニックネーム<input type="text" name="name" placeholder="add name here" required/></label>
+        <input type="submit" value="そうしんっ！"/>
+    }
+}

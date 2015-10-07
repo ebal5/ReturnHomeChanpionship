@@ -1,0 +1,3 @@
+package models.exceptions
+
+class JsUndefinedException(mes: String, cause: throwable = null) extends RuntimeException

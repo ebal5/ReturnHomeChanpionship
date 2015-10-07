@@ -1,0 +1,25 @@
+@(title: String, styles: List[String] = null)(content: Html)
+
+<!DOCTYPE html>
+
+<html lang="ja">
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen, projection" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        @if(styles != null){
+            @for(css <- styles){
+                <link rel="stylesheet" media="screen, projection" href="@css">
+            }
+        }
+    </head>
+    <body>
+        <header>
+            第17回全国高等専門学校帰宅選手権(仮称)
+        </header>
+        @content
+        <footer>
+            &copy; 2015 Team 4J 
+        </footer>
+    </body>
+</html>

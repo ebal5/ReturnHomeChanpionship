@@ -67,8 +67,7 @@ function Application(tgtID, wsURL){
             this.socket.send(json);
         },        
         init: function (){
-            // var url = "@routes.Application.gameWS().webSocketURL()";
-            var url = 'ws://fes.eval.click:9000/gamews';
+            var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
             this.socket = new WebSocket(url);
             this.socket.onopen = function (){
                 logger.log("[WebSocket] -- Open new connection with url: "+url, 1);

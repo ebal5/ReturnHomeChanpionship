@@ -10,6 +10,8 @@ POST    /enter                      controllers.Application.enter
 
 GET     /game                       controllers.Application.game
 
+GET     /js/application.js          controllers.Application.gameJS
+
 GET     /gamews                     controllers.Application.gameWS
 
 # Map static resources from the /public folder to the /assets URL path

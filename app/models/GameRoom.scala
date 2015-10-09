@@ -17,6 +17,7 @@ case class UserWrapper(name: String, act: ActorRef){
   val results = new mutable.ArrayBuffer[Array[Int]]()
   val points = new mutable.ArrayBuffer[Int]()
   def total(): Int = points.foldLeft(0)((n, acc) => n+acc)
+  var done = false
 }
 
 class Entry() extends Actor{
@@ -29,8 +30,10 @@ class Entry() extends Actor{
   def receive = {
     case Add(name) =>
       if (users.isEmpty){
+        println("enqueue user")
         users.enqueue(UserWrapper(name, sender))
       }else{
+        println("new room")
         val u1 = users.dequeue
         val id = UUID.randomUUID.toString
         val room = context.actorOf(Props(classOf[GameRoom], id, u1, UserWrapper(name, sender)))
@@ -62,16 +65,21 @@ class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
 
   def receive = {
     case mes: MineMapMsg =>
+      println("test")
       val usr = get(sender)
       usr.maps += mes.map
+      println(usr.name)
       opp(sender).act ! mes
     case mes: ResultMsg =>
       val usr = get(sender)
       usr.results += mes.map
       usr.points += mes.pt
-      if(mes.wave == waves){
-        val enemy = opp(sender)
+      val enemy = opp(sender)
+      if(mes.wave == waves && enemy.done){
         usr.act ! FinalResult(usr.total, enemy.total)
+        enemy.act ! FinalResult(enemy.total, usr.total)
+      }else if(mes.wave == waves){
+        usr.done = true
       }
     case s =>
       println("[GameRoom] Unexpected message"+s.toString)

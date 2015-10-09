@@ -38,9 +38,11 @@ class User(name: String, out: ActorRef) extends Actor {
 
   private var oppName: String = ""
   private var roomID: String = ""
+  private var roomAct: ActorRef = null
 
   def receive = {
     case mes: JsValue =>
+      println(mes)
       val res = allCatch either {
         val id = (mes \ "id").validate[Int] match {
           case s: JsSuccess[Int] => s.get
@@ -55,7 +57,7 @@ class User(name: String, out: ActorRef) extends Actor {
         (mes \ "data") match {
           case d: JsDefined =>
             tp match {
-              case "Restart" | "Ready" =>
+              case "Restart" | "Start" =>
                 mes_Start(id, d.get, sender)
               case "MineMap" =>
                 mes_MineMap(id, d.get, sender)
@@ -70,6 +72,7 @@ class User(name: String, out: ActorRef) extends Actor {
       }
       res match {
         case Right(json) =>
+          println(json)
           out ! json
         case Left(e) =>
           val json = newMes("Error", Json.toJson(e.getMessage))
@@ -77,19 +80,23 @@ class User(name: String, out: ActorRef) extends Actor {
           out ! json
       }
     case mes: Start =>
-      val json = newMes("Ready", Json.toJson(mes))
+      val json = newMes("Start", Json.toJson(mes))
       oppName = mes.opp
       roomID = mes.rid
+      roomAct = sender
       out ! json
     case mes: FinalResult =>
       val json = newMes("FinalResult", Json.toJson(mes))
       out ! json
+    case mes: MineMapMsg =>
+      out ! newMes("MineMap", Json.toJson(mes))
     case s =>
       println("[User] Unexpected message. "+s.toString)
   }
 
   override def preStart = {
     Entry.entry ! Add(this.name)
+    out ! newMes("Wait", JsString("Wait prease"))
   }
 
   def newMes(tp: String, data: JsValue): JsValue = Json.obj(
@@ -110,7 +117,7 @@ class User(name: String, out: ActorRef) extends Actor {
       case e: JsError =>
         throw new JsUnintelligibleException("Cannot get mine map")
     }
-    room ! mineMap
+    roomAct ! mineMap
     newMes("Complete", JsString("Got mine map"))
   }
 
@@ -120,7 +127,7 @@ class User(name: String, out: ActorRef) extends Actor {
       case e: JsError =>
         throw new JsUnintelligibleException("Cannot get Result")
     }
-    room ! result
+    roomAct ! result
     newMes("Complete", JsString("Got result"))
   }
 }

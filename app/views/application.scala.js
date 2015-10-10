@@ -32,7 +32,7 @@ Logger.prototype.log = function (str, level){
         this.logging(lvMes+str);
     }
 };
-var logger = new Logger(0);
+var logger = new Logger(1);
 
 function Application(tgtID, wsURL){
     var self = this;
@@ -69,7 +69,7 @@ function Application(tgtID, wsURL){
         },        
         init: function (){
             var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
-            // var url = 'ws://fes.eval.click:9000/gamews';
+            logger.log("URL is :"+url, 1);
             this.socket = new WebSocket(url);
             this.socket.onopen = function (){
                 logger.log("[WebSocket] -- Open new connection with url: "+url, 1);

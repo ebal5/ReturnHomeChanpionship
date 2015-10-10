@@ -44,6 +44,7 @@ function Application(tgtID, wsURL){
     this.myMap = [0,0,0,0,0,0,0,0,0,0];
     this.doMap = [0,0,0,0,0,0,0,0,0,0];
     this.rsMap = [0,0,0,0,0,0,0,0,0,0];
+    this.tmpMap = [0,0,0,0,0,0,0,0,0,0];
     this.gameDone = false;
     this.editFlag = false;
     this.getDone = false;
@@ -67,8 +68,8 @@ function Application(tgtID, wsURL){
             this.socket.send(json);
         },        
         init: function (){
-            // var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
-            var url = 'ws://fes.eval.click:9000/gamews';
+            var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
+            // var url = 'ws://fes.eval.click:9000/gamews';
             this.socket = new WebSocket(url);
             this.socket.onopen = function (){
                 logger.log("[WebSocket] -- Open new connection with url: "+url, 1);
@@ -363,9 +364,10 @@ Application.prototype.toggleBomb = function (b){
 };
 
 Application.prototype.setDoMap = function (map){
-    this.doMap = map;
+    this.tmpMap = map;
     this.getDone = true;
-    if(!this.editFlag){
+    if(!this.editFlag && !this.doFlag){
+        this.doMap = this.tmpMap;
         this.do();
     }
     logger.log("[Application] -- Set enemy map.");

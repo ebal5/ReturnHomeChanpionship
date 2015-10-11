@@ -306,6 +306,7 @@ Application.prototype.getFRes = function (data){
 Application.prototype.do = function (){
     // 開始メッセージでも表示する？
     // 現在の状態がその一例。 正直アニメーションはめんどかった。
+    this.doMap = this.tmpMap;
     this.getDone = false;
     var ctx = this.ctx;
     this.rsMap = [0,0,0,0,0,0,0,0,0,0];
@@ -370,7 +371,7 @@ Application.prototype.setDoMap = function (map){
         this.doMap = this.tmpMap;
         this.do();
     }
-    logger.log("[Application] -- Set enemy map.");
+    logger.log("[Application] -- Set enemy map.",1);
 };
 
 Application.prototype.sendMap = function (){

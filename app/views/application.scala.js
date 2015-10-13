@@ -129,8 +129,58 @@ Application.prototype.drawWave = function (){
     ctx.fillText('Wave '+this.wave, 200, 100);
     ctx.fillText('あいて： '+this.oppName+' さん', 200, 50);
 };
+Application.prototype.drawDecos = function (){
+    var ctx = this.ctx;
+    var old = ctx.lineWidth;
+
+    // draw School
+    ctx.fillStyle = '#888';
+    ctx.strokeStyle = '#888';
+    ctx.fillRect(90, 245, 25, 25);
+    ctx.fillRect(65, 270, 75,50);
+    ctx.beginPath();
+    ctx.arc(102.5, 257.5, 10, 0, 2*Math.PI, true);
+    ctx.closePath();
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    // draw House
+    ctx.strokeStyle = '#E6B85C';
+    ctx.beginPath();
+    ctx.lineWidth = 15;
+    ctx.moveTo(615, 260);
+    ctx.lineTo(615, 240);
+    ctx.closePath();
+    ctx.stroke();    
+
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = '#f00';    
+    ctx.beginPath();
+    ctx.moveTo(570, 263);
+    ctx.lineTo(600, 245);
+    ctx.lineTo(630, 263);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#E6B85C';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(625, 260);
+    ctx.lineTo(625, 310);
+    ctx.lineTo(575, 310);
+    ctx.lineTo(575, 260);
+    ctx.lineTo(600, 245);
+    ctx.lineTo(625, 260);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.lineWidth = old;
+};
+
 Application.prototype.drawMyMap = function (){
     this.drawWave();
+    this.drawDecos();
     var ctx = this.ctx;
     ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
@@ -151,12 +201,13 @@ Application.prototype.drawMyMap = function (){
     ctx.fillText('地雷 あと '+remain+'個', 500, 100);
 
     ctx.fillStyle = '#faa';
-    ctx.fillRect(200, 300, 100, 50);
+    ctx.fillRect(300, 450, 100, 50);
     ctx.fillStyle = '#000';
-    ctx.fillText('埋める', 210, 330);
+    ctx.fillText('埋める', 310, 480);
 };
 Application.prototype.drawDoMap = function (){
     this.drawWave();
+    this.drawDecos();
     var ctx = this.ctx;
     ctx.strokeStyle = '#000';
     var bombs = 0;
@@ -170,19 +221,19 @@ Application.prototype.drawDoMap = function (){
     ctx.fillText('解除ツール あと '+this.tool+'個', 400, 100);
     
     ctx.fillStyle = '#faa';
-    ctx.fillRect(100, 300, 100, 50);
+    ctx.fillRect(100, 450, 100, 50);
     ctx.fillStyle = '#000';
-    ctx.fillText('進む',110, 330);
+    ctx.fillText('進む',110, 480);
 
     ctx.fillStyle = '#faa';
-    ctx.fillRect(300, 300, 100, 50);
+    ctx.fillRect(300, 450, 100, 50);
     ctx.fillStyle = '#000';
-    ctx.fillText('解除',310, 330);
+    ctx.fillText('解除',310, 480);
 
     ctx.fillStyle = '#faa';
-    ctx.fillRect(500, 300, 100, 50);
+    ctx.fillRect(500, 450, 100, 50);
     ctx.fillStyle = '#000';
-    ctx.fillText('戻る', 510, 330);
+    ctx.fillText('戻る', 510, 480);
 
     for(var j = 0; j <= this.pos; j++){
         switch (this.rsMap[j]){
@@ -410,7 +461,7 @@ Application.prototype.click = function (){
             if(y >= 150 && y <= 200 && x >= 100 && x <= 600){
                 var num = Math.floor((x - 100)/50);
                 self.toggleBomb(num);
-            }else if(y >= 300 && y <= 350 && x >= 200 && x <= 300 && self.checkMyMap()){
+            }else if(y >= 450 && y <= 500 && x >= 300 && x <= 400 && self.checkMyMap()){
                 self.sendMap();
                 if(self.getDone){
                     self.do();
@@ -419,7 +470,7 @@ Application.prototype.click = function (){
                 }
             }
         }else if(self.doFlag){
-            if(y >= 300 && y <= 350 && self.pos < 9){
+            if(y >= 450 && y <= 500 && self.pos < 9){
                 var func;
                 if(x >= 100 && x <= 200){
                     // 通常の進行

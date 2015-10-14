@@ -52,7 +52,7 @@ function Application(tgtID, wsURL){
     this.ws = {
         socket: undefined,
         init: function (){
-            var url = wsURL || "@routes.Application.gameWS().WebSocketURL()";
+            var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
             this.socket = new WebSocket(url);
             this.socket.onopen = function (){
                 logger.log("[WebSocket] -- Open new connection with url: "+url, 1);

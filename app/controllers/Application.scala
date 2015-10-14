@@ -48,4 +48,11 @@ class Application extends Controller {
       case Some(name) => Right(User.props(name))
     })
   }
+
+  def gameJS = Action {implicit rs =>
+    rs.session.get("name") match {
+      case None => BadRequest("Nick name is missing")
+      case Some(name) => Ok(views.js.application(name))
+    }
+  }
 }

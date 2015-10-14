@@ -1,0 +1,23 @@
+.fl_r {
+    float: left;
+    margin-left: 10px;
+}
+
+.center{
+    text-xarign: center;
+}
+
+.fl_container::after{
+    clear: both;
+    content: "";
+    display: block;
+}
+
+.list{
+    background-color: #b0eeb0;
+    font-size: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 3px;
+    padding: 5px 10px 5px;
+    list-style-type: none;
+}

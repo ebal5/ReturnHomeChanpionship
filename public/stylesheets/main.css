@@ -1,0 +1,15 @@
+body{
+    background-color: blue;
+    background-image: url("/assets/images/cloud-background-sozai10.png");
+    font-size: 16px;
+}
+
+header > h1{
+    font-size: 30px;
+    color: #e89090;
+}
+
+footer > p {
+    color: black;
+    font-size: 20px;
+}

@@ -1,9 +1,16 @@
 @(name: String)
 
-@main("第17回全国高専帰宅選手権"){
-    <ul>
-        <li>@name さん</li>
-    </ul>
-    <canvas id="target" width="800" height="600"></canvas>
+@main("第17回全国高専帰宅選手権", "/assets/stylesheets/game.css"){
+
+    <div class="fl_container center">
+        <ul class="fl_r list">
+            <li>@name さん</li>
+        </ul>
+        <div class="center fl_r">
+            <canvas id="target" width="800" height="600"></canvas>
+        </div>
+    </div>
     <script src="@routes.Application.gameJS()"></script>
+    <p><a href="http://函館高専.jp/gohome.html">プロジェクトページへ</a></p>
+    <p><a href="../">Top ページ</a></p>
 }

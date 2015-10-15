@@ -21,3 +21,13 @@
     padding: 5px 10px 5px;
     list-style-type: none;
 }
+
+.ranking{
+    list-style-type: upper-roman;
+    font-size: 20px;
+    border-radius: 20px;
+    box-shadow: 5px 5px 3px;
+    padding: 5px 10px 5px 15px;
+    margin: 10px;
+    background-color: #b0eeb0;
+}

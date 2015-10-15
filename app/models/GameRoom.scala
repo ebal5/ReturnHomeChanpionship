@@ -3,12 +3,14 @@ package models
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import java.io._
 import java.util.UUID
 import play.api.libs.json._
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 
 case class Add(name: String)
 case class Delete(name: String)
@@ -71,8 +73,60 @@ object ResultMsg {
 }
 case class Bye(mes: String) extends Msg
 
+case class Rank(name: String, point: Int)
+object Rank {
+  implicit val RankReads = Json.reads[Rank]
+  implicit val RankWrites = Json.writes[Rank]
+}
+
 class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
   private val waves = 3
+  val rankingFile = "/var/games/festival/ranking.dat"
+
+  def getRanking():Option[List[Rank]] = {
+    val file = new File(rankingFile)
+    if (file.createNewFile){
+      None
+    }else{
+      val scr = Source.fromFile(rankingFile)
+      val str = scr.getLines.reduceOption((z,n) => z+"\n"+n)
+      val json = str match {
+        case Some(s) => Json.parse(s)
+        case None => Json.toJson("")
+      }
+      if (json == Json.toJson("")){
+        None
+      }else{
+        json.validate[List[Rank]] match {
+          case s: JsSuccess[List[Rank]] =>
+            Some(s.get.sortBy(r => r.point).reverse.take(10))
+          case e: JsError =>
+            println(rankingFile+" is wrong file")
+            None
+        }
+      }
+    }
+  }
+
+  def setRanking(ls: List[Rank]){
+    val file = new File(rankingFile)
+    val oldOption = getRanking()
+    oldOption match {
+      case Some(s) =>
+        val ranking = (s ++ ls).sortBy(r => r.point).reverse
+        val json = Json.toJson(ranking)
+        val out = new PrintWriter(file)
+        println(json.toString)
+        out.println(json)
+        out.close
+      case None =>
+        val json = Json.toJson(ls)
+        val out = new PrintWriter(file)
+        println(json.toString)
+        out.println(json)
+        out.close
+    }
+  }
 
   def receive = {
     case mes: MineMapMsg =>
@@ -83,10 +137,18 @@ class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
       val usr = get(sender)
       usr.results += mes.map
       usr.points += mes.pt
+      val ranking = getRanking() match {
+        case Some(r) =>
+          u1.act ! r
+          u2.act ! r
+        case None =>
+          println("Nothing for ranking")
+      }
       val enemy = opp(sender)
       if(mes.wave == waves && enemy.done){
         usr.act ! FinalResult(usr.total, enemy.total)
         enemy.act ! FinalResult(enemy.total, usr.total)
+        setRanking(List[Rank](Rank(usr.name, usr.total), Rank(enemy.name, enemy.total)))
       }else if(mes.wave == waves){
         usr.done = true
       }
@@ -103,5 +165,12 @@ class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
   override def preStart = {
     u1.act ! Start(u2.name, rid)
     u2.act ! Start(u1.name, rid)
+    getRanking match {
+        case Some(r) =>
+          u1.act ! r
+          u2.act ! r
+        case None =>
+          println("Nothing for ranking")
+    }
   }
 }

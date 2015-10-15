@@ -3,11 +3,18 @@
 @main("第17回全国高専帰宅選手権", "/assets/stylesheets/game.css"){
 
     <div class="fl_container center">
-        <ul class="fl_r list">
-            <li>@name さん</li>
-        </ul>
+        <div class="fl_r">
+            <ul class="list">
+                <li>@name さん</li>
+            </ul>
+        </div>
         <div class="center fl_r">
             <canvas id="target" width="800" height="600"></canvas>
+        </div>
+        <div class="fl_r shadow ranking">
+            ランキング
+            <ol id="ranking" class="">
+            </ol>
         </div>
     </div>
     <script src="@routes.Application.gameJS()"></script>

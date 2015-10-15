@@ -90,6 +90,10 @@ function Application(tgtID, wsURL){
                     logger.log("[WebSocket] -- Restart message");
                     self.waiting();
                     break;
+                case "Ranking":
+                    logger.log("[WebSocket] -- new ranking");
+                    self.ranking(obj.data);
+                    break;
                 case "Start":
                     logger.log("[WebSocket] -- Start message");
                     self.oppName = obj.data.opp;
@@ -283,7 +287,8 @@ Application.prototype.clearWave = function (){
     ctx.fillStyle = '#0e9';
     ctx.font = 'bold 50px serif';
     ctx.fillText("Clear wave "+self.wave, 300, 250);
-    var fn = function (){self.doFlag = false; self.sendRes();};
+    this.doFlag=false;
+    var fn = function (){self.sendRes();};
     window.setTimeout(fn, 2000);
 };
 
@@ -296,7 +301,8 @@ Application.prototype.bomb = function (){
     ctx.arc(400,300,200,0, Math.PI*2, true);
     ctx.fill();
     var self = this;
-    var fn = function (){self.doFlag=false; self.sendRes();};
+    self.doFlag=false;
+    var fn = function (){self.sendRes();};
     window.setTimeout(fn, 2000);
 };
 
@@ -333,14 +339,16 @@ Application.prototype.edit = function (){
 
 Application.prototype.getPoint = function (){
     var point = 0;
-    for(var i = 0; i < this.rsMap.length; i++){
-        if(this.rsMap[i] == 4){
-            break;
-        }else if(this.rsMap[i] == 1)
-        {
-            point = 0;break;
-        }else {
-            point++;
+    if(this.pos != 0){
+        for(var i = 0; i < this.rsMap.length; i++){
+            if(this.rsMap[i] == 4){
+                break;
+            }else if(this.rsMap[i] == 1)
+            {
+                point = 0;break;
+            }else {
+                point++;
+            }
         }
     }
     return point;
@@ -414,6 +422,16 @@ Application.prototype.reset = function (){
     logger.log("[Application] -- Reset game.", 2);
     this.ws.send("Restart", null);
     this.waiting();
+};
+
+Application.prototype.ranking = function (data){
+    var tgt = document.getElementById('ranking');
+    tgt.innerHTML = "";
+    for (var i = 0; i < data.length; i++){
+        var elm = document.createElement('li');
+        elm.innerHTML = data[i].name + " さん : "+data[i].point+" ポイント";
+        tgt.appendChild(elm);
+    }
 };
 
 Application.prototype.waiting = function (){

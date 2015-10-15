@@ -93,6 +93,9 @@ class User(name: String, out: ActorRef) extends Actor {
       out ! newMes("MineMap", Json.toJson(mes))
     case mes: Bye =>
       out ! newMes("Error", JsString("Connection refused"))
+    case mes: List[Rank] =>
+      println("Ranking")
+      out ! newMes("Ranking", Json.toJson(mes))
     case s =>
       println("[User] Unexpected message. "+s.toString)
   }

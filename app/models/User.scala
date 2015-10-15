@@ -39,6 +39,7 @@ class User(name: String, out: ActorRef) extends Actor {
   private var oppName: String = ""
   private var roomID: String = ""
   private var roomAct: ActorRef = null
+  private var lastGreat = System.currentTimeMillis
 
   def receive = {
     case mes: JsValue =>
@@ -63,6 +64,8 @@ class User(name: String, out: ActorRef) extends Actor {
                 mes_MineMap(id, d.get, sender)
               case "Result" =>
                 mes_Result(id, d.get, sender)
+              case "Pong" =>
+                this.lastGreat = System.currentTimeMillis
               case s =>
                 throw new JsOutOfRangeException("Not enable type("+s+")")
             }
@@ -90,6 +93,8 @@ class User(name: String, out: ActorRef) extends Actor {
       out ! json
     case mes: MineMapMsg =>
       out ! newMes("MineMap", Json.toJson(mes))
+    case mes: Bye =>
+      out ! newMes("Error", JsString("Connection refused"))
     case s =>
       println("[User] Unexpected message. "+s.toString)
   }
@@ -97,6 +102,13 @@ class User(name: String, out: ActorRef) extends Actor {
   override def preStart = {
     Entry.entry ! Add(this.name)
     out ! newMes("Wait", JsString("Wait prease"))
+  }
+
+  override def postStop = {
+    Entry.entry ! Delete(this.name)
+    if(roomAct != null){
+      roomAct ! Bye("Connection refused")
+    }
   }
 
   def newMes(tp: String, data: JsValue): JsValue = Json.obj(

@@ -11,6 +11,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class Add(name: String)
+case class Delete(name: String)
 
 case class UserWrapper(name: String, act: ActorRef){
   val maps = new mutable.ArrayBuffer[Array[Int]]()
@@ -38,6 +39,15 @@ class Entry() extends Actor{
         val id = UUID.randomUUID.toString
         val room = context.actorOf(Props(classOf[GameRoom], id, u1, UserWrapper(name, sender)))
       }
+    case Delete(name) =>
+      if (!users.isEmpty){
+        val u1 = users.dequeue
+        if (!(u1.name == name)){
+          users.enqueue(u1)
+        }else{
+          println("dequeue user")
+        }
+      }
     case other =>
       println(other.toString)
   }
@@ -59,6 +69,7 @@ object ResultMsg {
   implicit val ResultMsgReads = Json.reads[ResultMsg]
   implicit val ResultMsgWrites = Json.writes[ResultMsg]
 }
+case class Bye(mes: String) extends Msg
 
 class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
   private val waves = 3
@@ -81,8 +92,11 @@ class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
       }else if(mes.wave == waves){
         usr.done = true
       }
+    case mes: Bye =>
+      opp(sender).act ! mes
+      self ! PoisonPill
     case s =>
-      println("[GameRoom] Unexpected message"+s.toString)
+      println("[GameRoom] Unexpected message "+s.toString)
   }
 
   private def opp(tgt: ActorRef): UserWrapper = if(u1.act == tgt){ u2}else{ u1}

@@ -69,10 +69,14 @@ function Application(tgtID, wsURL){
         },        
         init: function (){
             var url = 'ws://fes.eval.click:443/gamews' || wsURL || "@routes.Application.gameWS().webSocketURL()";
+            // var url = wsURL || "@routes.Application.gameWS().webSocketURL()";
             logger.log("URL is :"+url, 1);
             this.socket = new WebSocket(url);
             this.socket.onopen = function (){
                 logger.log("[WebSocket] -- Open new connection with url: "+url, 1);
+            };
+            this.socket.onclose = function (){
+                self.ws.send("Bye", "Good bye!");
             };
             this.socket.onmessage = function (ev){
                 var obj = JSON.parse(ev.data);
@@ -100,10 +104,18 @@ function Application(tgtID, wsURL){
                     self.getFRes(obj.data);
                     break;
                 case "Complete":
-                    logger.log("[WebSocket -- Copmplete message");
+                    logger.log("[WebSocket] -- Copmplete message");
+                    break;
+                case "Ping":
+                    logger.log("[WebSocket] -- receive ping message");
+                    self.ws.send("Pong", "I'm living");
+                    break;
+                case "Wait":
+                    logger.log("[WebSocket] -- Wait message from server");
                     break;
                 case "Error":
                     logger.log("[WebSocket -- Error message: "+obj.data,3);
+                    self.drawError();
                     break;
                 default:
                     logger.log("[WebSocket] -- undefined type. type: "+obj.type, 3);
@@ -176,6 +188,15 @@ Application.prototype.drawDecos = function (){
     ctx.fill();
 
     ctx.lineWidth = old;
+};
+Application.prototype.drawError = function (){
+    this.drawBack();
+    var result = confirm("コネクションが切断されました。もう一度プレイしますか？");
+    if(result){
+        this.reset();
+    }else{
+        location.href = "/";
+    }
 };
 
 Application.prototype.drawMyMap = function (){

@@ -43,7 +43,6 @@ class User(name: String, out: ActorRef) extends Actor {
 
   def receive = {
     case mes: JsValue =>
-      println(mes)
       val res = allCatch either {
         val id = (mes \ "id").validate[Int] match {
           case s: JsSuccess[Int] => s.get
@@ -75,7 +74,6 @@ class User(name: String, out: ActorRef) extends Actor {
       }
       res match {
         case Right(json) =>
-          println(json)
           out ! json
         case Left(e) =>
           val json = newMes("Error", Json.toJson(e.getMessage))

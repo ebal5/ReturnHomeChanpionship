@@ -76,10 +76,8 @@ class GameRoom(rid: String, u1: UserWrapper, u2: UserWrapper) extends Actor {
 
   def receive = {
     case mes: MineMapMsg =>
-      println("test")
       val usr = get(sender)
       usr.maps += mes.map
-      println(usr.name)
       opp(sender).act ! mes
     case mes: ResultMsg =>
       val usr = get(sender)

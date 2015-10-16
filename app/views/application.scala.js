@@ -32,7 +32,13 @@ Logger.prototype.log = function (str, level){
         this.logging(lvMes+str);
     }
 };
-var logger = new Logger(1);
+var logger = new Logger(0);
+
+function Queue((size){
+    size = size || -1;
+    this.limit = size;
+    this._queueu = [];
+}
 
 function Application(tgtID, wsURL){
     var self = this;
@@ -61,6 +67,7 @@ function Application(tgtID, wsURL){
 
     this.ws = {
         socket: undefined,
+	log: [],
         send: function (tp, data){
             var obj = {"id": this.idGen(),"type": tp,"data": data};
             var json = JSON.stringify(obj);
@@ -80,6 +87,7 @@ function Application(tgtID, wsURL){
             };
             this.socket.onmessage = function (ev){
                 var obj = JSON.parse(ev.data);
+		this.log.push(obj);
                 logger.log("[WebSocket] -- Get a message. message: "+obj.toString(), 0);
                 switch (obj.type){
                 case "MineMap":

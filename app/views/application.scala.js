@@ -34,11 +34,9 @@ Logger.prototype.log = function (str, level){
 };
 var logger = new Logger(0);
 
-function Queue((size){
-    size = size || -1;
-    this.limit = size;
-    this._queueu = [];
-}
+var wslog = [];
+var sendLog = [];
+var points = [];
 
 function Application(tgtID, wsURL){
     var self = this;
@@ -67,9 +65,9 @@ function Application(tgtID, wsURL){
 
     this.ws = {
         socket: undefined,
-	log: [],
         send: function (tp, data){
             var obj = {"id": this.idGen(),"type": tp,"data": data};
+	    sendLog.push(obj);
             var json = JSON.stringify(obj);
             logger.log("[WebSocket] -- Send a message. message: "+json, 0);            
             this.socket.send(json);
@@ -87,7 +85,7 @@ function Application(tgtID, wsURL){
             };
             this.socket.onmessage = function (ev){
                 var obj = JSON.parse(ev.data);
-		this.log.push(obj);
+		wslog.push(obj);
                 logger.log("[WebSocket] -- Get a message. message: "+obj.toString(), 0);
                 switch (obj.type){
                 case "MineMap":
@@ -347,7 +345,7 @@ Application.prototype.edit = function (){
 
 Application.prototype.getPoint = function (){
     var point = 0;
-    if(this.pos != 0){
+    if(this.pos >= 0){
         for(var i = 0; i < this.rsMap.length; i++){
             if(this.rsMap[i] == 4){
                 break;
@@ -489,6 +487,7 @@ Application.prototype.sendRes = function (){
         map: this.rsMap,
         pt: pt
     };
+    points.push(obj);
     this.ws.send("Result", obj);
     if(this.wave < 3){this.edit();}else{this.waiting();}
 };
@@ -536,8 +535,8 @@ Application.prototype.click = function (){
                         }
                     }
                 }else if(x >= 300 && x <= 400){
-                    // 解除ツールの使用
-                    if(self.tool > 0){
+                    // 解除ツール use
+		    if(self.tool > 0){
                         self.pos++;
                         self.tool--;
                         if(self.doMap[self.pos] == 1){
